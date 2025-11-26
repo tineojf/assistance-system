@@ -1,4 +1,4 @@
-import AttendanceAnalyzer from "./Attendance";
+import AttendanceAnalyzer from "./components/AttendanceAnalyzer";
 import "./index.css";
 
 function App() {
