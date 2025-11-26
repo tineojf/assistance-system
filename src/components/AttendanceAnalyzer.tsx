@@ -42,14 +42,14 @@ const AttendanceAnalyzer = () => {
 
   const [employees, setEmployees] = useState<Employees>({
     "Elizabeth 1": { start: "08:00", end: "18:00" },
-    "Principe 2": { start: "07:00", end: "19:00" },
     "Orlando 3": { start: "08:00", end: "18:00" },
+    "Nicole 13": { start: "08:00", end: "18:00" },
+    "Principe 2": { start: "07:00", end: "19:00" },
     "Chino 4": { start: "07:00", end: "19:00" },
     "Mendez 6": { start: "07:00", end: "19:00" },
     "Vallejo 7": { start: "07:00", end: "19:00" },
     "Juan 10": { start: "07:00", end: "19:00" },
     "Teofilo 11": { start: "07:00", end: "19:00" },
-    "Nicole 13": { start: "08:00", end: "18:00" },
     "Edgar 14": { start: "07:00", end: "19:00" },
   });
 
