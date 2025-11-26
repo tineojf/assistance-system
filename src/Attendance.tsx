@@ -446,7 +446,6 @@ const AttendanceAnalyzer = () => {
                 </h3>
                 <pre className="text-xs bg-white p-2 rounded overflow-x-auto">
                   Número,Nombre,Tiempo,Estado,Dispositivos,Tipo de Registro
-                  1,Elizabeth 1,03/11/2025 08:02:31,Entrada,Asistencia,0
                 </pre>
               </div>
             </div>
@@ -663,7 +662,7 @@ const AttendanceAnalyzer = () => {
                           </tr>
                         </thead>
                         <tbody>
-                          {analysis[empName].slice(0, 10).map((day, idx) => (
+                          {analysis[empName].slice(0, 15).map((day, idx) => (
                             <tr
                               key={idx}
                               className={
@@ -699,7 +698,7 @@ const AttendanceAnalyzer = () => {
                         </tbody>
                       </table>
                     </div>
-                    {analysis[empName].length > 10 && (
+                    {analysis[empName].length > 15 && (
                       <p className="text-sm text-gray-600 mt-2">
                         Mostrando 10 de {analysis[empName].length} días (ver
                         Excel para reporte completo)
