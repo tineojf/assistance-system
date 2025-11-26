@@ -11,16 +11,6 @@ export const parseCSV = (text: string): CsvRecord[] => {
     throw new Error("CSV vacío o inválido");
   }
 
-  // Headers esperados (solo para validación simple)
-  const expectedHeaders = [
-    "Número",
-    "Nombre",
-    "Tiempo",
-    "Estado",
-    "Dispositivos",
-    "Tipo de Registro",
-  ];
-
   const headerLine = lines[0].split(",").map((h) => h.trim());
   if (headerLine.length < 4) {
     throw new Error("El CSV no contiene las columnas mínimas requeridas.");
