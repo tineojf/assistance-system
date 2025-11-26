@@ -6,6 +6,7 @@ import type {
   CsvRecord,
   AnalysisDay,
 } from "../types/attendance";
+
 import {
   parseDateTime,
   parseOnlyDate,
@@ -49,7 +50,7 @@ export const analyzeAttendance = (
       lostHours: 0,
     };
 
-    let currentDate = new Date(startDate);
+    const currentDate = new Date(startDate.getTime());
 
     while (currentDate <= endDate) {
       const dateStr = formatDate(currentDate);
@@ -101,7 +102,9 @@ export const analyzeAttendance = (
             dayAnalysis.observations.push("Faltó entrada");
             summaryResult[empName].absences++;
           } else {
-            const entryTime = new Date(Math.min(...entries));
+            const entryTime = new Date(
+              Math.min(...entries.map((d) => d.getTime()))
+            );
             dayAnalysis.entryTime = formatTime(entryTime);
 
             const [scheduleStartHour, scheduleStartMin] = empSchedule.start
@@ -133,11 +136,15 @@ export const analyzeAttendance = (
             dayAnalysis.observations.push("Faltó salida");
             summaryResult[empName].absences++;
           } else {
-            const exitTime = new Date(Math.max(...exits));
+            const exitTime = new Date(
+              Math.max(...exits.map((d) => d.getTime()))
+            );
             dayAnalysis.exitTime = formatTime(exitTime);
 
             if (entries.length > 0) {
-              const entry = new Date(Math.min(...entries));
+              const entry = new Date(
+                Math.min(...entries.map((d) => d.getTime()))
+              );
 
               const totalMinutes = Math.floor(
                 (exitTime.getTime() - entry.getTime()) / 60000
