@@ -17,6 +17,9 @@ import type {
   NewEmployee,
   DateRange,
   AppStep,
+  AnalysisResult,
+  Summary,
+  AnalysisDay,
 } from "../types/attendance";
 
 import { parseCSV } from "../utils/csv";
@@ -52,8 +55,8 @@ const AttendanceAnalyzer = () => {
 
   const [dateRange, setDateRange] = useState<DateRange>({ start: "", end: "" });
 
-  const [analysis, setAnalysis] = useState({});
-  const [summary, setSummary] = useState({});
+  const [analysis, setAnalysis] = useState<AnalysisResult>({});
+  const [summary, setSummary] = useState<Summary>({});
   const [error, setError] = useState("");
 
   const [editingEmployee, setEditingEmployee] = useState<string | null>(null);
@@ -450,39 +453,41 @@ const AttendanceAnalyzer = () => {
                           </thead>
 
                           <tbody>
-                            {days.slice(0, 15).map((day: any, idx: number) => (
-                              <tr
-                                key={idx}
-                                className={
-                                  day.observations.includes("Fin de semana")
-                                    ? "bg-gray-50"
-                                    : ""
-                                }
-                              >
-                                <td className="border p-2">{day.date}</td>
-                                <td className="border p-2 text-center">
-                                  {day.entryTime}
-                                </td>
-                                <td className="border p-2 text-center">
-                                  {day.status}
-                                </td>
-                                <td className="border p-2 text-center">
-                                  {day.exitTime}
-                                </td>
-                                <td className="border p-2 text-center">
-                                  {day.totalTime}
-                                </td>
-                                <td className="border p-2 text-center">
-                                  {day.extraHours}
-                                </td>
-                                <td className="border p-2 text-center">
-                                  {day.lostHours}
-                                </td>
-                                <td className="border p-2 text-center">
-                                  {day.observations.join(", ")}
-                                </td>
-                              </tr>
-                            ))}
+                            {days
+                              .slice(0, 15)
+                              .map((day: AnalysisDay, idx: number) => (
+                                <tr
+                                  key={idx}
+                                  className={
+                                    day.observations.includes("Fin de semana")
+                                      ? "bg-gray-50"
+                                      : ""
+                                  }
+                                >
+                                  <td className="border p-2">{day.date}</td>
+                                  <td className="border p-2 text-center">
+                                    {day.entryTime}
+                                  </td>
+                                  <td className="border p-2 text-center">
+                                    {day.status}
+                                  </td>
+                                  <td className="border p-2 text-center">
+                                    {day.exitTime}
+                                  </td>
+                                  <td className="border p-2 text-center">
+                                    {day.totalTime}
+                                  </td>
+                                  <td className="border p-2 text-center">
+                                    {day.extraHours}
+                                  </td>
+                                  <td className="border p-2 text-center">
+                                    {day.lostHours}
+                                  </td>
+                                  <td className="border p-2 text-center">
+                                    {day.observations.join(", ")}
+                                  </td>
+                                </tr>
+                              ))}
                           </tbody>
                         </table>
                       </div>
@@ -576,7 +581,9 @@ const AttendanceAnalyzer = () => {
           {step > 0 && (
             <div className="flex justify-between mt-8">
               <button
-                onClick={() => setStep((prev) => Math.max(0, prev - 1))}
+                onClick={() =>
+                  setStep((prev) => Math.max(0, prev - 1) as AppStep)
+                }
                 className="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600 flex items-center"
               >
                 <ChevronLeft className="w-5 h-5 mr-1" />
@@ -587,7 +594,7 @@ const AttendanceAnalyzer = () => {
                 <button
                   onClick={() => {
                     if (step === 2) runAnalysis();
-                    else setStep(step + 1);
+                    else setStep((step + 1) as AppStep);
                   }}
                   className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 flex items-center"
                 >
