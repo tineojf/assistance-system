@@ -202,6 +202,46 @@ const AttendanceAnalyzer = () => {
                 Lista de Empleados
               </h2>
 
+              {/* Tabla de horarios globales */}
+              <div className="flex justify-center mb-8">
+                <table className="border-collapse shadow-lg rounded-lg overflow-hidden text-sm">
+                  <thead className="bg-blue-600 text-white">
+                    <tr>
+                      <th className="px-4 py-2 border">Tipo</th>
+                      <th className="px-6 py-2 border">
+                        Horarios que se analizarán
+                      </th>
+                    </tr>
+                  </thead>
+
+                  <tbody>
+                    <tr className="bg-white">
+                      <td className="px-4 py-2 border font-medium text-center">
+                        Oficina
+                      </td>
+                      <td className="px-6 py-2 border text-center">
+                        08:00 – 18:00
+                      </td>
+                    </tr>
+
+                    <tr className="bg-gray-50">
+                      <td className="px-4 py-2 border font-medium text-center">
+                        Operario
+                      </td>
+                      <td className="px-6 py-2 border text-center">
+                        <div className="flex flex-col">
+                          <span>07:00 – 19:00</span>
+                          <span>19:00 – 07:00</span>
+                          <span>
+                            24 horas (requiere confirmación del supervisor)
+                          </span>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
               {/* Agregar empleado */}
               <div className="grid grid-cols-3 gap-2 mb-6 items-center">
                 <input
@@ -224,7 +264,7 @@ const AttendanceAnalyzer = () => {
                         setNewEmployee({ ...newEmployee, type: "office" })
                       }
                     />
-                    Oficina (8–18)
+                    Oficina
                   </label>
 
                   <label className="flex items-center gap-2">
@@ -235,7 +275,7 @@ const AttendanceAnalyzer = () => {
                         setNewEmployee({ ...newEmployee, type: "operator" })
                       }
                     />
-                    Operario (7–19 / 19–7 / 24h)
+                    Operario
                   </label>
                 </div>
 
