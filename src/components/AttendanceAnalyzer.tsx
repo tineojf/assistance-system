@@ -19,7 +19,6 @@ import type {
   AppStep,
   AnalysisResult,
   Summary,
-  AnalysisDay,
 } from "../types/attendance";
 
 import { parseCSV } from "../utils/csv";
@@ -69,6 +68,12 @@ const AttendanceAnalyzer = () => {
     start: "07:00",
     end: "19:00",
   });
+
+  const [openEmployee, setOpenEmployee] = useState<string | null>(null);
+
+  const toggleEmployee = (name: string) => {
+    setOpenEmployee(openEmployee === name ? null : name);
+  };
 
   // -----------------------------
   // Subir CSV
@@ -438,71 +443,75 @@ const AttendanceAnalyzer = () => {
               <div className="space-y-8">
                 {Object.keys(analysis).map((empName) => {
                   const days = analysis[empName];
+                  const isOpen = openEmployee === empName;
 
                   return (
-                    <div key={empName} className="border rounded-lg p-4">
-                      <h3 className="text-xl font-semibold mb-3">{empName}</h3>
+                    <div key={empName} className="border rounded-lg">
+                      {/* Header — botón para desplegar */}
+                      <button
+                        onClick={() => toggleEmployee(empName)}
+                        className="w-full text-left p-4 flex justify-between items-center"
+                      >
+                        <h3 className="text-xl font-semibold">{empName}</h3>
+                        <span>{isOpen ? "▲" : "▼"}</span>
+                      </button>
 
-                      <div className="overflow-x-auto">
-                        <table className="w-full text-sm">
-                          <thead>
-                            <tr className="bg-gray-100">
-                              <th className="border p-2">Fecha</th>
-                              <th className="border p-2">Hora Entrada</th>
-                              <th className="border p-2">Estado</th>
-                              <th className="border p-2">Hora Salida</th>
-                              <th className="border p-2">Tiempo Total</th>
-                              <th className="border p-2">Horas Extras</th>
-                              <th className="border p-2">Horas Perdidas</th>
-                              <th className="border p-2">Observaciones</th>
-                            </tr>
-                          </thead>
-
-                          <tbody>
-                            {days
-                              .slice(0, 15)
-                              .map((day: AnalysisDay, idx: number) => (
-                                <tr
-                                  key={idx}
-                                  className={
-                                    day.observations.includes("Fin de semana")
-                                      ? "bg-gray-50"
-                                      : ""
-                                  }
-                                >
-                                  <td className="border p-2">{day.date}</td>
-                                  <td className="border p-2 text-center">
-                                    {day.entryTime}
-                                  </td>
-                                  <td className="border p-2 text-center">
-                                    {day.status}
-                                  </td>
-                                  <td className="border p-2 text-center">
-                                    {day.exitTime}
-                                  </td>
-                                  <td className="border p-2 text-center">
-                                    {day.totalTime}
-                                  </td>
-                                  <td className="border p-2 text-center">
-                                    {day.extraHours}
-                                  </td>
-                                  <td className="border p-2 text-center">
-                                    {day.lostHours}
-                                  </td>
-                                  <td className="border p-2 text-center">
-                                    {day.observations.join(", ")}
-                                  </td>
+                      {/* Contenido del acordeón */}
+                      {isOpen && (
+                        <div className="p-4 border-t">
+                          <div className="overflow-x-auto">
+                            <table className="w-full text-sm">
+                              <thead>
+                                <tr className="bg-gray-100">
+                                  <th className="border p-2">Fecha</th>
+                                  <th className="border p-2">Hora Entrada</th>
+                                  <th className="border p-2">Estado</th>
+                                  <th className="border p-2">Hora Salida</th>
+                                  <th className="border p-2">Tiempo Total</th>
+                                  <th className="border p-2">Horas Extras</th>
+                                  <th className="border p-2">Horas Perdidas</th>
+                                  <th className="border p-2">Observaciones</th>
                                 </tr>
-                              ))}
-                          </tbody>
-                        </table>
-                      </div>
+                              </thead>
 
-                      {days.length > 15 && (
-                        <p className="text-sm text-gray-600 mt-2">
-                          Mostrando 15 de {days.length} días (ver Excel para
-                          reporte completo)
-                        </p>
+                              <tbody>
+                                {days.map((day, idx) => (
+                                  <tr
+                                    key={idx}
+                                    className={
+                                      day.observations.includes("Fin de semana")
+                                        ? "bg-gray-50"
+                                        : ""
+                                    }
+                                  >
+                                    <td className="border p-2">{day.date}</td>
+                                    <td className="border p-2 text-center">
+                                      {day.entryTime}
+                                    </td>
+                                    <td className="border p-2 text-center">
+                                      {day.status}
+                                    </td>
+                                    <td className="border p-2 text-center">
+                                      {day.exitTime}
+                                    </td>
+                                    <td className="border p-2 text-center">
+                                      {day.totalTime}
+                                    </td>
+                                    <td className="border p-2 text-center">
+                                      {day.extraHours}
+                                    </td>
+                                    <td className="border p-2 text-center">
+                                      {day.lostHours}
+                                    </td>
+                                    <td className="border p-2 text-center">
+                                      {day.observations.join(", ")}
+                                    </td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
                       )}
                     </div>
                   );
