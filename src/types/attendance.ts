@@ -26,6 +26,7 @@ export interface AnalysisDay {
   exitTime: string; // "18:00" o "—"
   extraHours: string; // "0h 0m" o "1h 15m"
   lostHours: string; // "0h 0m" o "-10m"
+  schedule: string;
   observations: string[];
 }
 
