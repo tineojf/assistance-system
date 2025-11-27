@@ -59,7 +59,7 @@ export const analyzeAttendance = (
       });
 
       const dayAnalysis: AnalysisDay = {
-        entryDate: "—",
+        entryDate: dateStr,
         entryTime: "—",
         status: "—",
         exitDate: "—",
@@ -67,7 +67,6 @@ export const analyzeAttendance = (
         extraHours: "—",
         lostHours: "—",
         observations: [],
-        date: dateStr, // !delete
       };
 
       // -------------------------

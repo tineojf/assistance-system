@@ -485,8 +485,7 @@ const AttendanceAnalyzer = () => {
                                     }
                                   >
                                     <td className="border p-2 text-center">
-                                      {day.date}
-                                      {/* change to day.entryDate */}
+                                      {day.entryDate}
                                     </td>
                                     <td className="border p-2 text-center">
                                       {day.entryTime}
