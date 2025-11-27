@@ -463,11 +463,11 @@ const AttendanceAnalyzer = () => {
                             <table className="w-full text-sm">
                               <thead>
                                 <tr className="bg-gray-100">
-                                  <th className="border p-2">Fecha</th>
+                                  <th className="border p-2">Fecha Entrada</th>
                                   <th className="border p-2">Hora Entrada</th>
                                   <th className="border p-2">Estado</th>
+                                  <th className="border p-2">Fecha Salida</th>
                                   <th className="border p-2">Hora Salida</th>
-                                  <th className="border p-2">Tiempo Total</th>
                                   <th className="border p-2">Horas Extras</th>
                                   <th className="border p-2">Horas Perdidas</th>
                                   <th className="border p-2">Observaciones</th>
@@ -484,7 +484,10 @@ const AttendanceAnalyzer = () => {
                                         : ""
                                     }
                                   >
-                                    <td className="border p-2">{day.date}</td>
+                                    <td className="border p-2 text-center">
+                                      {day.date}
+                                      {/* change to day.entryDate */}
+                                    </td>
                                     <td className="border p-2 text-center">
                                       {day.entryTime}
                                     </td>
@@ -492,10 +495,10 @@ const AttendanceAnalyzer = () => {
                                       {day.status}
                                     </td>
                                     <td className="border p-2 text-center">
-                                      {day.exitTime}
+                                      {day.exitDate}
                                     </td>
                                     <td className="border p-2 text-center">
-                                      {day.totalTime}
+                                      {day.exitTime}
                                     </td>
                                     <td className="border p-2 text-center">
                                       {day.extraHours}

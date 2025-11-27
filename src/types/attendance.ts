@@ -15,14 +15,16 @@ export interface CsvRecord {
 }
 
 export interface AnalysisDay {
-  date: string; // "dd/mm/yyyy"
+  entryDate: string; // "dd/mm/yyyy"
   entryTime: string; // "08:00" o "—"
-  status: string; // "—" | "tarde" | otros
+  status: string; // "—" | "tarde"
+  exitDate: string; // "dd/mm/yyyy"
   exitTime: string; // "18:00" o "—"
-  totalTime: string; // "8h 0m" o "—"
   extraHours: string; // "0h 0m" o "1h 15m"
   lostHours: string; // "0h 0m" o "-10m"
   observations: string[];
+  totalTime: string; // "8h 0m" o "—" -- delete
+  date: string; // "dd/mm/yyyy" -- delete
 }
 
 export type AnalysisResult = Record<string, AnalysisDay[]>;
