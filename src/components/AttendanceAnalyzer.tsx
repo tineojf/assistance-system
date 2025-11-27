@@ -53,7 +53,10 @@ const AttendanceAnalyzer = () => {
     "Edgar 14": { start: "07:00", end: "19:00" },
   });
 
-  const [dateRange, setDateRange] = useState<DateRange>({ start: "", end: "" });
+  const [dateRange, setDateRange] = useState<DateRange>({
+    start: "01/11/2025",
+    end: "15/11/2025",
+  });
 
   const [analysis, setAnalysis] = useState<AnalysisResult>({});
   const [summary, setSummary] = useState<Summary>({});
