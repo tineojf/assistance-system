@@ -107,7 +107,7 @@ export const analyzeAttendance = (
 
       // encontrar pares cuya entrada cae este día OR orphanExit cuya salida cae este día
       const pairsForDay = pairs.filter((p) => {
-        if (p.orphanExit && p.exitDate) {
+        if (!p.entryDate && p.exitDate) {
           return formatDate(p.exitDate) === dayStr;
         }
         if (p.entryDate) {
@@ -214,7 +214,7 @@ export const analyzeAttendance = (
       // Para cada par del día construir la fila
       for (const p of pairsForDay) {
         // salida huérfana
-        if (p.orphanExit && p.exitDate) {
+        if (!p.entryDate && p.exitDate) {
           const ex = p.exitDate;
           analysisResult[empName].push({
             entryDate: dayStr,
