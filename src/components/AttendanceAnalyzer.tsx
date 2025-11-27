@@ -39,18 +39,27 @@ const AttendanceAnalyzer = () => {
   const [step, setStep] = useState<AppStep>(0);
   const [csvData, setCsvData] = useState<CsvRecord[]>([]);
 
+  // empleados
   const [employees, setEmployees] = useState<Employees>({
-    "Elizabeth 1": { start: "08:00", end: "18:00" },
-    "Orlando 3": { start: "08:00", end: "18:00" },
-    "Nicole 13": { start: "08:00", end: "18:00" },
-    "Principe 2": { start: "07:00", end: "19:00" },
-    "Chino 4": { start: "07:00", end: "19:00" },
-    "Mendez 6": { start: "07:00", end: "19:00" },
-    "Vallejo 7": { start: "07:00", end: "19:00" },
-    "Juan 10": { start: "07:00", end: "19:00" },
-    "Teofilo 11": { start: "07:00", end: "19:00" },
-    "Edgar 14": { start: "07:00", end: "19:00" },
+    "Elizabeth 1": { type: "office" },
+    "Orlando 3": { type: "office" },
+    "Nicole 13": { type: "office" },
+    "Principe 2": { type: "operator" },
+    "Chino 4": { type: "operator" },
+    "Mendez 6": { type: "operator" },
+    "Vallejo 7": { type: "operator" },
+    "Juan 10": { type: "operator" },
+    "Teofilo 11": { type: "operator" },
+    "Edgar 14": { type: "operator" },
   });
+
+  const [newEmployee, setNewEmployee] = useState<NewEmployee>({
+    name: "",
+    type: "operator",
+  });
+
+  const [editingEmployee, setEditingEmployee] = useState<string | null>(null);
+  const [editingData, setEditingData] = useState<NewEmployee | null>(null);
 
   const [dateRange, setDateRange] = useState<DateRange>({
     start: "01/11/2025",
@@ -60,14 +69,6 @@ const AttendanceAnalyzer = () => {
   const [analysis, setAnalysis] = useState<AnalysisResult>({});
   const [summary, setSummary] = useState<Summary>({});
   const [error, setError] = useState("");
-
-  const [editingEmployee, setEditingEmployee] = useState<string | null>(null);
-
-  const [newEmployee, setNewEmployee] = useState<NewEmployee>({
-    name: "",
-    start: "07:00",
-    end: "19:00",
-  });
 
   const [openEmployee, setOpenEmployee] = useState<string | null>(null);
 
@@ -198,11 +199,11 @@ const AttendanceAnalyzer = () => {
           {step === 1 && (
             <div>
               <h2 className="text-2xl font-semibold mb-4">
-                Lista de Empleados y Horarios
+                Lista de Empleados
               </h2>
 
               {/* Agregar empleado */}
-              <div className="grid grid-cols-4 gap-2 mb-6">
+              <div className="grid grid-cols-3 gap-2 mb-6 items-center">
                 <input
                   type="text"
                   value={newEmployee.name}
@@ -213,23 +214,30 @@ const AttendanceAnalyzer = () => {
                   className="border rounded px-3 py-2"
                 />
 
-                <input
-                  type="time"
-                  value={newEmployee.start}
-                  onChange={(e) =>
-                    setNewEmployee({ ...newEmployee, start: e.target.value })
-                  }
-                  className="border rounded px-3 py-2"
-                />
+                {/* Radios */}
+                <div className="flex gap-4">
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="radio"
+                      checked={newEmployee.type === "office"}
+                      onChange={() =>
+                        setNewEmployee({ ...newEmployee, type: "office" })
+                      }
+                    />
+                    Oficina (8–18)
+                  </label>
 
-                <input
-                  type="time"
-                  value={newEmployee.end}
-                  onChange={(e) =>
-                    setNewEmployee({ ...newEmployee, end: e.target.value })
-                  }
-                  className="border rounded px-3 py-2"
-                />
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="radio"
+                      checked={newEmployee.type === "operator"}
+                      onChange={() =>
+                        setNewEmployee({ ...newEmployee, type: "operator" })
+                      }
+                    />
+                    Operario (7–19 / 19–7 / 24h)
+                  </label>
+                </div>
 
                 <button
                   onClick={() => {
@@ -237,11 +245,7 @@ const AttendanceAnalyzer = () => {
                     if (result.error) setError(result.error);
                     else {
                       setEmployees(result.updated);
-                      setNewEmployee({
-                        name: "",
-                        start: "07:00",
-                        end: "19:00",
-                      });
+                      setNewEmployee({ name: "", type: "operator" });
                       setError("");
                     }
                   }}
@@ -257,8 +261,7 @@ const AttendanceAnalyzer = () => {
                   <thead>
                     <tr className="bg-gray-100">
                       <th className="border p-2 text-left">Empleado</th>
-                      <th className="border p-2 text-center">Hora Inicio</th>
-                      <th className="border p-2 text-center">Hora Fin</th>
+                      <th className="border p-2 text-center">Tipo</th>
                       <th className="border p-2 text-center">Acciones</th>
                     </tr>
                   </thead>
@@ -271,61 +274,71 @@ const AttendanceAnalyzer = () => {
                         <tr key={name}>
                           {editingEmployee === name ? (
                             <>
+                              {/* NOMBRE */}
                               <td className="border p-2">
                                 <input
-                                  id={`name-${name}`}
-                                  defaultValue={name}
+                                  value={editingData?.name || ""}
+                                  onChange={(e) =>
+                                    setEditingData(
+                                      (prev) =>
+                                        prev && {
+                                          ...prev,
+                                          name: e.target.value,
+                                        }
+                                    )
+                                  }
                                   className="border rounded px-2 py-1 w-full"
                                 />
                               </td>
 
-                              <td className="border p-2">
-                                <input
-                                  id={`start-${name}`}
-                                  type="time"
-                                  defaultValue={emp.start}
-                                  className="border rounded px-2 py-1 w-full"
-                                />
+                              {/* TIPO */}
+                              <td className="border p-2 text-center">
+                                <div className="flex flex-col gap-2">
+                                  <label className="flex items-center gap-2 justify-center">
+                                    <input
+                                      type="radio"
+                                      name={`edit-type-${name}`}
+                                      checked={editingData?.type === "office"}
+                                      onChange={() =>
+                                        setEditingData(
+                                          (prev) =>
+                                            prev && { ...prev, type: "office" }
+                                        )
+                                      }
+                                    />
+                                    Oficina
+                                  </label>
+
+                                  <label className="flex items-center gap-2 justify-center">
+                                    <input
+                                      type="radio"
+                                      name={`edit-type-${name}`}
+                                      checked={editingData?.type === "operator"}
+                                      onChange={() =>
+                                        setEditingData(
+                                          (prev) =>
+                                            prev && {
+                                              ...prev,
+                                              type: "operator",
+                                            }
+                                        )
+                                      }
+                                    />
+                                    Operario
+                                  </label>
+                                </div>
                               </td>
 
-                              <td className="border p-2">
-                                <input
-                                  id={`end-${name}`}
-                                  type="time"
-                                  defaultValue={emp.end}
-                                  className="border rounded px-2 py-1 w-full"
-                                />
-                              </td>
-
+                              {/* BOTONES */}
                               <td className="border p-2 text-center">
                                 <button
                                   onClick={() => {
-                                    const newName = (
-                                      document.getElementById(
-                                        `name-${name}`
-                                      ) as HTMLInputElement
-                                    ).value;
-
-                                    const start = (
-                                      document.getElementById(
-                                        `start-${name}`
-                                      ) as HTMLInputElement
-                                    ).value;
-
-                                    const end = (
-                                      document.getElementById(
-                                        `end-${name}`
-                                      ) as HTMLInputElement
-                                    ).value;
+                                    if (!editingData) return;
 
                                     const updated = saveEmployee(
                                       employees,
                                       name,
-                                      {
-                                        name: newName,
-                                        start,
-                                        end,
-                                      }
+                                      editingData
                                     );
 
                                     setEmployees(updated);
@@ -348,14 +361,15 @@ const AttendanceAnalyzer = () => {
                             <>
                               <td className="border p-2">{name}</td>
                               <td className="border p-2 text-center">
-                                {emp.start}
+                                {emp.type === "office" ? "Oficina" : "Operario"}
                               </td>
-                              <td className="border p-2 text-center">
-                                {emp.end}
-                              </td>
+
                               <td className="border p-2 text-center">
                                 <button
-                                  onClick={() => setEditingEmployee(name)}
+                                  onClick={() => {
+                                    setEditingEmployee(name);
+                                    setEditingData({ name, type: emp.type });
+                                  }}
                                   className="text-blue-600 hover:text-blue-800 mr-2"
                                 >
                                   <Edit2 className="w-5 h-5 inline" />

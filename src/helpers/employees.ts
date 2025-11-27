@@ -1,4 +1,4 @@
-import type { Employees, NewEmployee, Employee } from "../types/attendance";
+import type { Employees, NewEmployee } from "../types/attendance";
 
 /**
  * Agrega un nuevo empleado a la lista.
@@ -24,10 +24,7 @@ export const addEmployee = (
 
   const updated: Employees = {
     ...employees,
-    [newEmployee.name]: {
-      start: newEmployee.start,
-      end: newEmployee.end,
-    },
+    [newEmployee.name]: { type: newEmployee.type },
   };
 
   return { updated, error: "" };
@@ -55,17 +52,11 @@ export const saveEmployee = (
 ): Employees => {
   const updated = { ...employees };
 
-  // Si cambia el nombre del empleado, borrar el registro anterior
   if (oldName !== newData.name) {
     delete updated[oldName];
   }
 
-  const employee: Employee = {
-    start: newData.start,
-    end: newData.end,
-  };
-
-  updated[newData.name] = employee;
+  updated[newData.name] = { type: newData.type };
 
   return updated;
 };

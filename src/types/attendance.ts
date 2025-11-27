@@ -1,7 +1,11 @@
-export type Employee = {
-  start: string; // "08:00"
-  end: string; // "18:00"
-};
+export interface Employee {
+  type: "operator" | "office";
+}
+
+export interface NewEmployee {
+  name: string;
+  type: "operator" | "office";
+}
 
 export type Employees = Record<string, Employee>;
 
@@ -39,12 +43,6 @@ export type Summary = Record<string, SummaryItem>;
 export interface DateRange {
   start: string; // "dd/mm/yyyy"
   end: string; // "dd/mm/yyyy"
-}
-
-export interface NewEmployee {
-  name: string;
-  start: string;
-  end: string;
 }
 
 export type AppStep = 0 | 1 | 2 | 3 | 4;
