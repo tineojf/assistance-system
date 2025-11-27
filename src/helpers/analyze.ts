@@ -69,8 +69,8 @@ export const analyzeAttendance = (
         extraHours: "—",
         lostHours: "—",
         observations: [],
-        date: dateStr, // delete
-        totalTime: "—", // delete
+        date: dateStr, // !delete
+        totalTime: "—", // !delete
       };
 
       // -------------------------
