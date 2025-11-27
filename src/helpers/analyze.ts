@@ -68,7 +68,6 @@ export const analyzeAttendance = (
         lostHours: "—",
         observations: [],
         date: dateStr, // !delete
-        totalTime: "—", // !delete
       };
 
       // -------------------------
@@ -140,15 +139,6 @@ export const analyzeAttendance = (
             dayAnalysis.exitTime = formatTime(exitTime);
 
             if (entries.length > 0) {
-              const entry = new Date(
-                Math.min(...entries.map((d) => d.getTime()))
-              );
-
-              const totalMinutes = Math.floor(
-                (exitTime.getTime() - entry.getTime()) / 60000
-              );
-              dayAnalysis.totalTime = minutesToHoursMinutes(totalMinutes);
-
               const [scheduleEndHour, scheduleEndMin] = empSchedule.end
                 .split(":")
                 .map(Number);
