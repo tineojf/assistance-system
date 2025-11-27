@@ -34,8 +34,6 @@ export interface SummaryItem {
   lates: number;
   extraHours: number; // en minutos
   lostHours: number; // en minutos
-  totalDays: number; // !delete
-  compliedDays: number; // !delete
 }
 
 export type Summary = Record<string, SummaryItem>;

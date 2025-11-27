@@ -42,10 +42,8 @@ export const analyzeAttendance = (
 
     analysisResult[empName] = [];
     summaryResult[empName] = {
-      totalDays: 0,
       absences: 0,
       lates: 0,
-      compliedDays: 0,
       extraHours: 0,
       lostHours: 0,
     };
@@ -79,8 +77,6 @@ export const analyzeAttendance = (
       if (isWeekend(currentDate)) {
         dayAnalysis.observations.push("Fin de semana");
       } else {
-        summaryResult[empName].totalDays++;
-
         // -------------------------
         // No hay registros
         // -------------------------
@@ -169,14 +165,6 @@ export const analyzeAttendance = (
                 dayAnalysis.extraHours = minutesToHoursMinutes(extraMinutes);
               } else {
                 dayAnalysis.extraHours = "0h 0m";
-              }
-
-              // Día cumplido
-              if (
-                dayAnalysis.observations.length === 0 &&
-                dayAnalysis.status !== "tarde"
-              ) {
-                summaryResult[empName].compliedDays++;
               }
             }
           }
