@@ -533,10 +533,8 @@ const AttendanceAnalyzer = () => {
                   <thead>
                     <tr className="bg-gray-100">
                       <th className="border p-2">Trabajador</th>
-                      <th className="border p-2">Días Totales</th>
                       <th className="border p-2">Inasistencias</th>
                       <th className="border p-2">Tardanzas</th>
-                      <th className="border p-2">Días Cumplidos</th>
                       <th className="border p-2">Horas Extra</th>
                       <th className="border p-2">Horas Perdidas</th>
                       <th className="border p-2">Diferencia</th>
@@ -550,22 +548,15 @@ const AttendanceAnalyzer = () => {
 
                       return (
                         <tr key={empName}>
-                          <td className="border p-2">{empName}</td>
-                          <td className="border p-2 text-center">
-                            {s.totalDays}
-                          </td>
+                          <td className="border p-2 text-center">{empName}</td>
+
                           <td className="border p-2 text-center">
                             {s.absences}
                           </td>
                           <td className="border p-2 text-center">{s.lates}</td>
                           <td className="border p-2 text-center">
-                            {s.compliedDays}
-                          </td>
-
-                          <td className="border p-2 text-center">
                             {minutesToHoursMinutes(s.extraHours)}
                           </td>
-
                           <td className="border p-2 text-center">
                             {minutesToHoursMinutes(s.lostHours)}
                           </td>

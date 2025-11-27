@@ -23,19 +23,19 @@ export interface AnalysisDay {
   extraHours: string; // "0h 0m" o "1h 15m"
   lostHours: string; // "0h 0m" o "-10m"
   observations: string[];
-  totalTime: string; // "8h 0m" o "—" -- delete
-  date: string; // "dd/mm/yyyy" -- delete
+  totalTime: string; // !delete
+  date: string; // !delete
 }
 
 export type AnalysisResult = Record<string, AnalysisDay[]>;
 
 export interface SummaryItem {
-  totalDays: number;
   absences: number;
   lates: number;
-  compliedDays: number;
   extraHours: number; // en minutos
   lostHours: number; // en minutos
+  totalDays: number; // !delete
+  compliedDays: number; // !delete
 }
 
 export type Summary = Record<string, SummaryItem>;
