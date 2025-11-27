@@ -130,40 +130,41 @@ export const analyzeAttendance = (
       // ----------------------------------------
       // Determinar schedule
       // ----------------------------------------
-      let schedule: string = "";
+      let schedule = "-";
 
-      if (employee.type === "office") {
+      // fin de semana sin registros
+      if (
+        (!p.entryDate && !p.exitDate) ||
+        (p.entryDate && isWeekend(p.entryDate) && !p.exitDate)
+      ) {
+        schedule = "—";
+      } else if (employee.type === "office") {
         schedule = "08:00 -> 18:00 (10h-dia)";
       } else {
         // operador
         if (p.entryDate && p.exitDate) {
-          const entryH = p.entryDate.getHours();
-          const exitH = p.exitDate.getHours();
+          // duración total en horas
+          let hoursWorked =
+            (p.exitDate.getTime() - p.entryDate.getTime()) / (1000 * 60 * 60);
+          if (hoursWorked < 0) hoursWorked += 24;
 
-          // si entra entre 7:00 y 19:00 y sale antes de 19:00 -> 12h día
-          if (entryH >= 7 && entryH < 19 && exitH <= 19) {
-            schedule = "07:00 -> 19:00 (12h-dia)";
-          }
-          // si entra después de 19:00 -> 12h noche
-          else if (entryH >= 19 || entryH < 7) {
-            schedule = "19:00 -> 07:00 (12h-noche)";
-          }
-          // si registra turno amanecida
-          else {
+          const entryH = p.entryDate.getHours();
+
+          if (hoursWorked >= 20) {
             schedule = "07:00 -> 07:00 (24h)";
-          }
-        } else {
-          // sin entrada o sin salida -> intentar adivinar según hora registrada
-          const referenceDate = p.entryDate || p.exitDate;
-          if (referenceDate) {
-            const h = referenceDate.getHours();
-            if (h >= 7 && h < 19) schedule = "07:00 -> 19:00 (12h-dia)";
-            else if (h >= 19 || h < 7) schedule = "19:00 -> 07:00 (12h-noche)";
-            else schedule = "07:00 -> 07:00 (24h)";
+          } else if (hoursWorked < 2) {
+            schedule =
+              entryH < 12
+                ? "07:00 -> 19:00 (12h-dia)"
+                : "19:00 -> 07:00 (12h-noche)";
           } else {
-            schedule = "—"; // sin info de hora
+            schedule =
+              entryH < 12
+                ? "07:00 -> 19:00 (12h-dia)"
+                : "19:00 -> 07:00 (12h-noche)";
           }
         }
+        // si no hay entrada o salida, schedule queda "-" y no se infiere nada
       }
 
       day.schedule = schedule;
