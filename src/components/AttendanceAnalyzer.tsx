@@ -421,6 +421,9 @@ const AttendanceAnalyzer = () => {
                 <p className="text-sm text-gray-600">
                   * Los sábados y domingos se excluyen del análisis laboral
                 </p>
+                <p className="text-sm text-gray-600">
+                  * Los feriados no se consideran en este análisis
+                </p>
               </div>
             </div>
           )}
