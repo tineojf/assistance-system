@@ -5,6 +5,7 @@ import type {
   DateRange,
   CsvRecord,
   AnalysisDay,
+  Pair,
 } from "../types/attendance";
 
 import {
@@ -54,13 +55,6 @@ export const analyzeAttendance = (
     analysisResult[empName] = [];
 
     // 1) Emparejar SOLO registros ADYACENTES según la regla que diste
-    type Pair = {
-      entryDate?: Date;
-      entryRecordIndex?: number;
-      exitDate?: Date;
-      exitRecordIndex?: number;
-      orphanExit?: boolean; // salida sin entrada
-    };
     const pairs: Pair[] = [];
 
     let i = 0;
@@ -82,7 +76,7 @@ export const analyzeAttendance = (
           });
           i += 2; // consumimos ambos registros
         } else {
-          // entrada sin salida inmediata (siguiente es entrada o no existe)
+          // entrada sin salida (siguiente es entrada o no existe)
           pairs.push({
             entryDate: recDate,
             entryRecordIndex: i,
@@ -92,13 +86,12 @@ export const analyzeAttendance = (
           i += 1;
         }
       } else {
-        // rec.estado === "Salida" -> salida sin entrada previa emparejada
+        // Salida sin entrada previa emparejada
         pairs.push({
           entryDate: undefined,
           entryRecordIndex: undefined,
           exitDate: recDate,
           exitRecordIndex: i,
-          orphanExit: true,
         });
         i += 1;
       }
@@ -329,7 +322,7 @@ export const analyzeAttendance = (
       }
 
       cursor.setDate(cursor.getDate() + 1);
-    } // end while days
+    }
   }); // end for employees
 
   return { analysis: analysisResult, summary: summaryResult };

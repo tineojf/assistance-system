@@ -48,3 +48,10 @@ export interface NewEmployee {
 }
 
 export type AppStep = 0 | 1 | 2 | 3 | 4;
+
+export type Pair = {
+  entryDate?: Date;
+  entryRecordIndex?: number;
+  exitDate?: Date;
+  exitRecordIndex?: number;
+};
