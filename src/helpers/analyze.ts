@@ -41,28 +41,19 @@ export const analyzeAttendance = (
   const analysisResult: AnalysisResult = {};
   const summaryResult: Summary = {};
 
+  // ----------------------------------------
+  // 1) Emparejar SOLO registros ADYACENTES
+  // Filtra los del empleado
+  // Ordena los registros
+  // Aagrupa en pares entrada-salida
+  // ----------------------------------------
   Object.keys(employees).forEach((empName) => {
-    // registros del empleado, ordenados cronológicamente
     const allRecords = csvData
       .filter((r) => r.nombre === empName)
       .sort(
         (a, b) =>
           parseDateTime(a.tiempo).getTime() - parseDateTime(b.tiempo).getTime()
       );
-
-    // inicializar summary
-    summaryResult[empName] = {
-      absences: 0,
-      lates: 0,
-      extraHours: 0,
-      lostHours: 0,
-    };
-
-    analysisResult[empName] = [];
-
-    // ----------------------------------------
-    // 1) Emparejar SOLO registros ADYACENTES
-    // ----------------------------------------
     const pairs: Pair[] = [];
     let i = 0;
 
@@ -105,11 +96,11 @@ export const analyzeAttendance = (
       }
     }
 
-    // guardar pairs en analysisResult (todavía no procesamos extra/lates)
-    // analysisResult[empName] = pairs;
-
     // log simple
     console.log(empName, pairs);
+
+    // guardar pairs en analysisResult (todavía no procesamos extra/lates)
+    // analysisResult[empName] = pairs;
   });
 
   return { analysis: analysisResult, summary: summaryResult };
