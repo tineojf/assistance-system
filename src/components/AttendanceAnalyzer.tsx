@@ -63,8 +63,8 @@ const AttendanceAnalyzer = () => {
 
   const [newEmployee, setNewEmployee] = useState<NewEmployee>({
     name: "",
-    start: "08:00",
-    end: "18:00",
+    start: "07:00",
+    end: "19:00",
   });
 
   // -----------------------------
@@ -231,8 +231,8 @@ const AttendanceAnalyzer = () => {
                       setEmployees(result.updated);
                       setNewEmployee({
                         name: "",
-                        start: "08:00",
-                        end: "18:00",
+                        start: "07:00",
+                        end: "19:00",
                       });
                       setError("");
                     }
