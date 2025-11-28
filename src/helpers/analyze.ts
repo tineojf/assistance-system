@@ -194,7 +194,7 @@ export const analyzeAttendance = (
             shiftStart = 7 * 60;
             shiftEnd = 19 * 60; // extra desde las 19:00
             is24h = true;
-            day.observations.push("turno 24h");
+            day.observations.push("Turno 24h");
             break;
         }
 
