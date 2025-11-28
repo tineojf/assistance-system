@@ -494,6 +494,17 @@ const AttendanceAnalyzer = () => {
                 Análisis por Empleado
               </h2>
 
+              {/* Mensaje informativo */}
+              <div className="mb-4 p-4 bg-yellow-100 text-yellow-800 border border-yellow-300 rounded">
+                <ul className="list-disc list-inside">
+                  <li>Los turnos de 24h requieren comprobación manual</li>
+                  <li>
+                    En los turnos de 24h se debe marcar hora de salida (se
+                    cuenta hora extra desde las 19:00)
+                  </li>
+                </ul>
+              </div>
+
               <div className="space-y-8">
                 {Object.keys(analysis).map((empName) => {
                   const days = analysis[empName];
@@ -580,6 +591,17 @@ const AttendanceAnalyzer = () => {
           {step === 4 && (
             <div>
               <h2 className="text-2xl font-semibold mb-4">Resumen General</h2>
+
+              {/* Mensaje informativo */}
+              <div className="mb-4 p-4 bg-yellow-100 text-yellow-800 border border-yellow-300 rounded">
+                <ul className="list-disc list-inside">
+                  <li>
+                    Las inasistencias se cuentan por cada falta de entrada o
+                    salida, no por día completo
+                  </li>
+                  <li>Los turnos de 24h requieren comprobación manual</li>
+                </ul>
+              </div>
 
               <div className="overflow-x-auto mb-6">
                 <table className="w-full">
