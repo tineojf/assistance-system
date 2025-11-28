@@ -520,10 +520,10 @@ const AttendanceAnalyzer = () => {
                                   <th className="border p-2">Fecha Entrada</th>
                                   <th className="border p-2">Hora Entrada</th>
                                   <th className="border p-2">Estado</th>
+                                  <th className="border p-2">Horas Perdidas</th>
                                   <th className="border p-2">Fecha Salida</th>
                                   <th className="border p-2">Hora Salida</th>
                                   <th className="border p-2">Horas Extras</th>
-                                  <th className="border p-2">Horas Perdidas</th>
                                   <th className="border p-2">Observaciones</th>
                                 </tr>
                               </thead>
@@ -548,6 +548,9 @@ const AttendanceAnalyzer = () => {
                                       {day.status}
                                     </td>
                                     <td className="border p-2 text-center">
+                                      {day.lostHours}
+                                    </td>
+                                    <td className="border p-2 text-center">
                                       {day.exitDate}
                                     </td>
                                     <td className="border p-2 text-center">
@@ -555,9 +558,6 @@ const AttendanceAnalyzer = () => {
                                     </td>
                                     <td className="border p-2 text-center">
                                       {day.extraHours}
-                                    </td>
-                                    <td className="border p-2 text-center">
-                                      {day.lostHours}
                                     </td>
                                     <td className="border p-2 text-center">
                                       {day.observations.join(", ")}
