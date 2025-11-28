@@ -175,6 +175,7 @@ export const analyzeAttendance = (
       if (p.entryDate && p.exitDate && schedule !== "—") {
         let shiftStart = 0;
         let shiftEnd = 0;
+        let is24h = false;
 
         switch (schedule) {
           case "08:00 -> 18:00 (10h-dia)":
@@ -191,7 +192,9 @@ export const analyzeAttendance = (
             break;
           case "07:00 -> 07:00 (24h)":
             shiftStart = 7 * 60;
-            shiftEnd = 7 * 60; // turno completo
+            shiftEnd = 19 * 60; // extra desde las 19:00
+            is24h = true;
+            day.observations.push("turno 24h");
             break;
         }
 
@@ -200,16 +203,29 @@ export const analyzeAttendance = (
         const exitMinutes =
           p.exitDate.getHours() * 60 + p.exitDate.getMinutes();
 
-        // horas perdidas → solo desde la entrada
-        const lostMinutes =
-          entryMinutes > shiftStart ? entryMinutes - shiftStart : 0;
-
-        // horas extra → solo desde la salida
+        let lostMinutes = 0;
         let extraMinutes = 0;
-        if (shiftEnd > shiftStart) {
+
+        if (is24h) {
+          // horas perdidas → desde la entrada hasta 07:00
+          lostMinutes =
+            entryMinutes > shiftStart ? entryMinutes - shiftStart : 0;
+          // horas extra → desde las 19:00 hasta salida
+          if (exitMinutes >= 19 * 60) {
+            extraMinutes = exitMinutes - 19 * 60;
+          } else {
+            // salida después de medianoche
+            extraMinutes = exitMinutes + (24 * 60 - 19 * 60);
+          }
+        } else if (shiftEnd > shiftStart) {
+          // turno normal día
+          lostMinutes =
+            entryMinutes > shiftStart ? entryMinutes - shiftStart : 0;
           extraMinutes = exitMinutes > shiftEnd ? exitMinutes - shiftEnd : 0;
         } else {
           // turno nocturno cruzando medianoche
+          lostMinutes =
+            entryMinutes > shiftStart ? entryMinutes - shiftStart : 0;
           extraMinutes =
             exitMinutes > shiftEnd
               ? exitMinutes - shiftEnd
