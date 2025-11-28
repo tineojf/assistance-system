@@ -98,9 +98,6 @@ export const analyzeAttendance = (
       }
     }
 
-    // log simple
-    console.log(empName, pairs);
-
     // ----------------------------------------
     // Crear AnalysisDay por pair
     // ----------------------------------------
@@ -168,8 +165,6 @@ export const analyzeAttendance = (
       }
 
       day.schedule = schedule;
-
-      console.log("Datos:", day);
 
       // TODO: calcular tardanzas, horas extra y horas perdidas según turno
       // ej: day.status = "tarde", day.extraHours = minutesToHoursMinutes(...)
