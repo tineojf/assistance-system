@@ -6,6 +6,7 @@ import type {
   CsvRecord,
   AnalysisDay,
   Pair,
+  SummaryItem,
 } from "../types/attendance";
 
 import {
@@ -14,11 +15,10 @@ import {
   formatDate,
   formatTime,
   isWeekend,
-  // minutesToHoursMinutes,
 } from "../utils/date";
 
 // ----------------------------------
-// Función inicial de análisis
+// Función de análisis de asistencia
 // ----------------------------------
 export const analyzeAttendance = (
   employees: Employees,
@@ -45,7 +45,7 @@ export const analyzeAttendance = (
   // 1) Emparejar SOLO registros ADYACENTES
   // Filtra los del empleado
   // Ordena los registros
-  // Aagrupa en pares entrada-salida
+  // Agrupa en pares entrada-salida
   // ----------------------------------------
   Object.keys(employees).forEach((empName) => {
     const employee = employees[empName];
@@ -56,6 +56,7 @@ export const analyzeAttendance = (
         (a, b) =>
           parseDateTime(a.tiempo).getTime() - parseDateTime(b.tiempo).getTime()
       );
+
     const pairs: Pair[] = [];
     let i = 0;
 
@@ -64,7 +65,6 @@ export const analyzeAttendance = (
       const recDate = parseDateTime(rec.tiempo);
 
       if (rec.estado === "Entrada") {
-        // si el siguiente existe y es Salida -> emparejar
         if (
           i + 1 < allRecords.length &&
           allRecords[i + 1].estado === "Salida"
@@ -75,9 +75,8 @@ export const analyzeAttendance = (
             exitDate: parseDateTime(allRecords[i + 1].tiempo),
             exitRecordIndex: i + 1,
           });
-          i += 2; // consumimos ambos registros
+          i += 2;
         } else {
-          // entrada sin salida (siguiente es entrada o no existe)
           pairs.push({
             entryDate: recDate,
             entryRecordIndex: i,
@@ -87,7 +86,6 @@ export const analyzeAttendance = (
           i += 1;
         }
       } else {
-        // Salida sin entrada previa emparejada
         pairs.push({
           entryDate: undefined,
           entryRecordIndex: undefined,
@@ -98,12 +96,17 @@ export const analyzeAttendance = (
       }
     }
 
-    // console.log("Pares: ", pairs); //* Pares
-
     // ----------------------------------------
-    // Crear AnalysisDay por pair
+    // Crear AnalysisDay por cada pair
     // ----------------------------------------
     const analysisDays: AnalysisDay[] = [];
+    const summary: SummaryItem = {
+      absences: 0,
+      lates: 0,
+      extraHours: 0,
+      lostHours: 0,
+    };
+
     pairs.forEach((p) => {
       const day: AnalysisDay = {
         entryDate: p.entryDate ? formatDate(p.entryDate) : "—",
@@ -117,21 +120,25 @@ export const analyzeAttendance = (
         observations: [],
       };
 
-      // marcar fin de semana
+      // Fin de semana
       if (p.entryDate && isWeekend(p.entryDate)) {
         day.observations.push("Fin de semana");
       }
 
-      // sin entrada o sin salida
-      if (!p.entryDate) day.observations.push("Sin entrada");
-      if (!p.exitDate) day.observations.push("Sin salida");
+      // Registros incompletos
+      if (!p.entryDate) {
+        day.observations.push("Sin entrada");
+        summary.absences++;
+      }
+      if (!p.exitDate) {
+        day.observations.push("Sin salida");
+        summary.absences++;
+      }
 
       // ----------------------------------------
       // Determinar schedule
       // ----------------------------------------
       let schedule = "-";
-
-      // fin de semana sin registros
       if (
         (!p.entryDate && !p.exitDate) ||
         (p.entryDate && isWeekend(p.entryDate) && !p.exitDate)
@@ -139,51 +146,92 @@ export const analyzeAttendance = (
         schedule = "—";
       } else if (employee.type === "office") {
         schedule = "08:00 -> 18:00 (10h-dia)";
-      } else {
-        // operador
-        if (p.entryDate && p.exitDate) {
-          // duración total en horas
-          let hoursWorked =
-            (p.exitDate.getTime() - p.entryDate.getTime()) / (1000 * 60 * 60);
-          if (hoursWorked < 0) hoursWorked += 24;
+      } else if (p.entryDate && p.exitDate) {
+        const entryH = p.entryDate.getHours();
+        let hoursWorked =
+          (p.exitDate.getTime() - p.entryDate.getTime()) / (1000 * 60 * 60);
+        if (hoursWorked < 0) hoursWorked += 24;
 
-          const entryH = p.entryDate.getHours();
-
-          if (hoursWorked >= 20) {
-            schedule = "07:00 -> 07:00 (24h)";
-          } else if (hoursWorked < 2) {
-            schedule =
-              entryH < 12
-                ? "07:00 -> 19:00 (12h-dia)"
-                : "19:00 -> 07:00 (12h-noche)";
-          } else {
-            schedule =
-              entryH < 12
-                ? "07:00 -> 19:00 (12h-dia)"
-                : "19:00 -> 07:00 (12h-noche)";
-          }
+        if (hoursWorked >= 20) {
+          schedule = "07:00 -> 07:00 (24h)";
+        } else if (hoursWorked < 2) {
+          schedule =
+            entryH < 12
+              ? "07:00 -> 19:00 (12h-dia)"
+              : "19:00 -> 07:00 (12h-noche)";
+        } else {
+          schedule =
+            entryH < 12
+              ? "07:00 -> 19:00 (12h-dia)"
+              : "19:00 -> 07:00 (12h-noche)";
         }
-        // si no hay entrada o salida, schedule queda "-" y no se infiere nada
       }
 
       day.schedule = schedule;
 
-      // TODO: calcular tardanzas, horas extra y horas perdidas según turno
-      // ej: day.status = "tarde", day.extraHours = minutesToHoursMinutes(...)
+      // ----------------------------------------
+      // Calcular horas extra, perdidas y status
+      // ----------------------------------------
+      if (p.entryDate && p.exitDate && schedule !== "—") {
+        let shiftHours = 0;
+        switch (schedule) {
+          case "08:00 -> 18:00 (10h-dia)":
+            shiftHours = 10;
+            break;
+          case "07:00 -> 19:00 (12h-dia)":
+          case "19:00 -> 07:00 (12h-noche)":
+            shiftHours = 12;
+            break;
+          case "07:00 -> 07:00 (24h)":
+            shiftHours = 24;
+            break;
+        }
+
+        let hoursWorked =
+          (p.exitDate.getTime() - p.entryDate.getTime()) / (1000 * 60 * 60);
+        if (hoursWorked < 0) hoursWorked += 24;
+
+        let extraMinutes = 0;
+        let lostMinutes = 0;
+        if (hoursWorked > shiftHours)
+          extraMinutes = Math.round((hoursWorked - shiftHours) * 60);
+        else if (hoursWorked < shiftHours)
+          lostMinutes = Math.round((shiftHours - hoursWorked) * 60);
+
+        day.extraHours = `${Math.floor(extraMinutes / 60)}h ${
+          extraMinutes % 60
+        }m`;
+        day.lostHours = `${Math.floor(lostMinutes / 60)}h ${lostMinutes % 60}m`;
+
+        summary.extraHours += extraMinutes;
+        summary.lostHours += lostMinutes;
+
+        // Status: tarde si llega después de hora de inicio + 5 min
+        let status = "—";
+        if (schedule !== "07:00 -> 07:00 (24h)") {
+          const startHour = schedule.startsWith("07:00")
+            ? 7
+            : schedule.startsWith("08:00")
+            ? 8
+            : 19;
+          const scheduledMinutes = startHour * 60;
+          const entryMinutes =
+            p.entryDate.getHours() * 60 + p.entryDate.getMinutes();
+          if (entryMinutes > scheduledMinutes) {
+            status = "tarde";
+            summary.lates++;
+          }
+        }
+        day.status = status;
+      }
 
       analysisDays.push(day);
     });
 
     analysisResult[empName] = analysisDays;
+    summaryResult[empName] = summary;
 
-    // console.log("Analisis de schedule: ", analysisDays); //* Pares
-
-    summaryResult[empName] = {
-      absences: 0,
-      lates: 0,
-      extraHours: 0,
-      lostHours: 0,
-    };
+    console.log("Analisis:", analysisDays);
   });
 
   return { analysis: analysisResult, summary: summaryResult };
