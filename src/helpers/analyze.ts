@@ -170,33 +170,51 @@ export const analyzeAttendance = (
       day.schedule = schedule;
 
       // ----------------------------------------
-      // Calcular horas extra, perdidas y status
+      // Calcular horas extra, horas perdidas y status
       // ----------------------------------------
       if (p.entryDate && p.exitDate && schedule !== "—") {
-        let shiftHours = 0;
+        let shiftStart = 0;
+        let shiftEnd = 0;
+
         switch (schedule) {
           case "08:00 -> 18:00 (10h-dia)":
-            shiftHours = 10;
+            shiftStart = 8 * 60;
+            shiftEnd = 18 * 60;
             break;
           case "07:00 -> 19:00 (12h-dia)":
+            shiftStart = 7 * 60;
+            shiftEnd = 19 * 60;
+            break;
           case "19:00 -> 07:00 (12h-noche)":
-            shiftHours = 12;
+            shiftStart = 19 * 60;
+            shiftEnd = 7 * 60; // cruzando medianoche
             break;
           case "07:00 -> 07:00 (24h)":
-            shiftHours = 24;
+            shiftStart = 7 * 60;
+            shiftEnd = 7 * 60; // turno completo
             break;
         }
 
-        let hoursWorked =
-          (p.exitDate.getTime() - p.entryDate.getTime()) / (1000 * 60 * 60);
-        if (hoursWorked < 0) hoursWorked += 24;
+        const entryMinutes =
+          p.entryDate.getHours() * 60 + p.entryDate.getMinutes();
+        const exitMinutes =
+          p.exitDate.getHours() * 60 + p.exitDate.getMinutes();
 
+        // horas perdidas → solo desde la entrada
+        const lostMinutes =
+          entryMinutes > shiftStart ? entryMinutes - shiftStart : 0;
+
+        // horas extra → solo desde la salida
         let extraMinutes = 0;
-        let lostMinutes = 0;
-        if (hoursWorked > shiftHours)
-          extraMinutes = Math.round((hoursWorked - shiftHours) * 60);
-        else if (hoursWorked < shiftHours)
-          lostMinutes = Math.round((shiftHours - hoursWorked) * 60);
+        if (shiftEnd > shiftStart) {
+          extraMinutes = exitMinutes > shiftEnd ? exitMinutes - shiftEnd : 0;
+        } else {
+          // turno nocturno cruzando medianoche
+          extraMinutes =
+            exitMinutes > shiftEnd
+              ? exitMinutes - shiftEnd
+              : exitMinutes + (24 * 60 - shiftEnd);
+        }
 
         day.extraHours = `${Math.floor(extraMinutes / 60)}h ${
           extraMinutes % 60
@@ -206,23 +224,9 @@ export const analyzeAttendance = (
         summary.extraHours += extraMinutes;
         summary.lostHours += lostMinutes;
 
-        // Status: tarde si llega después de hora de inicio + 5 min
-        let status = "—";
-        if (schedule !== "07:00 -> 07:00 (24h)") {
-          const startHour = schedule.startsWith("07:00")
-            ? 7
-            : schedule.startsWith("08:00")
-            ? 8
-            : 19;
-          const scheduledMinutes = startHour * 60;
-          const entryMinutes =
-            p.entryDate.getHours() * 60 + p.entryDate.getMinutes();
-          if (entryMinutes > scheduledMinutes) {
-            status = "tarde";
-            summary.lates++;
-          }
-        }
-        day.status = status;
+        // Status exacto, sin margen
+        day.status = entryMinutes > shiftStart ? "tarde" : "—";
+        if (day.status === "tarde") summary.lates++;
       }
 
       analysisDays.push(day);
