@@ -31,11 +31,10 @@ export const exportToExcel = (
 
     analysis[empName].forEach((day) => {
       analysisData.push([
-        day.date,
+        day.entryDate,
         day.entryTime,
         day.status,
         day.exitTime,
-        day.totalTime,
         day.extraHours,
         day.lostHours,
         day.observations.join(", "),
@@ -70,10 +69,8 @@ export const exportToExcel = (
 
     summaryData.push([
       empName,
-      s.totalDays,
       s.absences,
       s.lates,
-      s.compliedDays,
       minutesToHoursMinutes(s.extraHours),
       minutesToHoursMinutes(s.lostHours),
       (diff >= 0 ? "+" : "") + minutesToHoursMinutes(diff),
