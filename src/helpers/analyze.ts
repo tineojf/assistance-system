@@ -98,6 +98,8 @@ export const analyzeAttendance = (
       }
     }
 
+    // console.log("Pares: ", pairs); //* Pares
+
     // ----------------------------------------
     // Crear AnalysisDay por pair
     // ----------------------------------------
@@ -173,6 +175,8 @@ export const analyzeAttendance = (
     });
 
     analysisResult[empName] = analysisDays;
+
+    // console.log("Analisis de schedule: ", analysisDays); //* Pares
 
     summaryResult[empName] = {
       absences: 0,
