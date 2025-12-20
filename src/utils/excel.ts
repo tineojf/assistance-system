@@ -19,13 +19,13 @@ export const exportToExcel = (
   Object.keys(analysis).forEach((empName) => {
     analysisData.push([empName]);
     analysisData.push([
-      "Fecha",
+      "Fecha Entrada",
       "Hora Entrada",
       "Estado",
-      "Hora Salida",
-      "Tiempo Total",
-      "Horas Extras",
       "Horas Perdidas",
+      "Fecha Salida",
+      "Hora Salida",
+      "Horas Extras",
       "Observaciones",
     ]);
 
@@ -34,9 +34,10 @@ export const exportToExcel = (
         day.entryDate,
         day.entryTime,
         day.status,
+        day.lostHours,
+        day.exitDate,
         day.exitTime,
         day.extraHours,
-        day.lostHours,
         day.observations.join(", "),
       ]);
     });
@@ -53,10 +54,8 @@ export const exportToExcel = (
   const summaryData: (string | number)[][] = [
     [
       "Trabajador",
-      "Días Totales",
       "Inasistencias",
       "Tardanzas",
-      "Días Cumplidos",
       "Horas Extra",
       "Horas Perdidas",
       "Diferencia",
